@@ -155,7 +155,7 @@ jobs:
 
       # ── 5. Upload artifact (every build) ────────────────────────────────
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: shanutechx-linux-${{ matrix.platform }}
           path: shanutechx-linux-${{ matrix.platform }}.tar.gz
