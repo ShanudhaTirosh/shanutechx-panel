@@ -1,0 +1,192 @@
+name: Release ShanuTechX
+
+# ─── Triggers ────────────────────────────────────────────────────────────────
+# • Push a tag "v1.0.0" (or any v*.*.*) → builds + creates a public GitHub release
+# • Push to main / any branch  → builds only (no release), artifacts uploaded
+# • Workflow Dispatch           → manual trigger from the GitHub Actions UI
+# ─────────────────────────────────────────────────────────────────────────────
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*.*.*"
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "**.sh"
+      - "frontend/**"
+      - "x-ui.service.debian"
+      - "x-ui.service.arch"
+      - "x-ui.service.rhel"
+  pull_request:
+    paths:
+      - "**.go"
+      - "go.mod"
+      - "go.sum"
+      - "**.sh"
+      - "frontend/**"
+
+jobs:
+  build:
+    name: Build (${{ matrix.platform }})
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - amd64     # Most VPS / cloud servers  ← you almost certainly want this one
+          - arm64     # Raspberry Pi 4, AWS Graviton, Oracle Ampere
+          - armv7     # Older Raspberry Pi 3
+          - 386       # 32-bit x86 (rare but cheap VMs)
+          # - armv6   # uncomment if you need it
+          # - armv5   # uncomment if you need it
+          # - s390x   # uncomment if you need it
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Node / Frontend ───────────────────────────────────────────────
+      # The Go binary embeds internal/web/dist at compile time (//go:embed all:dist).
+      # The frontend MUST be built before `go build`.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build frontend
+        run: |
+          npm ci
+          npm run build
+        working-directory: frontend
+
+      # ── 3. Go / Backend ──────────────────────────────────────────────────
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          check-latest: true
+
+      - name: Build ShanuTechX binary
+        run: |
+          export CGO_ENABLED=1
+          export GOOS=linux
+          export GOARCH=${{ matrix.platform }}
+
+          # Bootlin prebuilt musl cross-toolchains (static binary, no glibc dep)
+          case "${{ matrix.platform }}" in
+            amd64)  BOOTLIN_ARCH="x86-64" ;;
+            arm64)  BOOTLIN_ARCH="aarch64" ;;
+            armv7)  BOOTLIN_ARCH="armv7-eabihf"; export GOARCH=arm GOARM=7 ;;
+            armv6)  BOOTLIN_ARCH="armv6-eabihf"; export GOARCH=arm GOARM=6 ;;
+            armv5)  BOOTLIN_ARCH="armv5-eabi";   export GOARCH=arm GOARM=5 ;;
+            386)    BOOTLIN_ARCH="x86-i686" ;;
+            s390x)  BOOTLIN_ARCH="s390x-z13" ;;
+          esac
+
+          echo "Fetching Bootlin toolchain for ${BOOTLIN_ARCH}…"
+          BASE="https://toolchains.bootlin.com/downloads/releases/toolchains/${BOOTLIN_ARCH}/tarballs/"
+          TARBALL=$(curl -fsSL "$BASE" | grep -oE "${BOOTLIN_ARCH}--musl--stable-[^\"]+\.tar\.xz" | sort -r | head -1)
+          [ -z "$TARBALL" ] && { echo "Toolchain not found for ${BOOTLIN_ARCH}" >&2; exit 1; }
+
+          cd /tmp
+          curl -fL -sS -o "$TARBALL" "${BASE}${TARBALL}"
+          tar -xf "$TARBALL"
+          TOOLCHAIN=$(find . -maxdepth 1 -type d -name "${BOOTLIN_ARCH}--musl--stable-*" | head -1)
+          export PATH="$(realpath "$TOOLCHAIN")/bin:$PATH"
+          export CC=$(realpath "$(find "$TOOLCHAIN/bin" -name '*-gcc.br_real' -executable | head -1)")
+          cd -
+
+          go build \
+            -ldflags "-w -s -X 'main.version=$(git describe --tags --abbrev=0 2>/dev/null || echo v1.0.0-shanutechx)' -linkmode external -extldflags '-static'" \
+            -o shanutechx-release \
+            -v main.go
+
+          file shanutechx-release
+          ldd shanutechx-release || echo "✓ Static binary"
+
+          # ── Assemble release package ──────────────────────────────────────
+          mkdir shanutechx
+          cp shanutechx-release shanutechx/x-ui      # binary must stay "x-ui" for x-ui.sh
+          cp x-ui.service.debian shanutechx/
+          cp x-ui.service.arch   shanutechx/
+          cp x-ui.service.rhel   shanutechx/
+          cp x-ui.sh             shanutechx/
+          mkdir shanutechx/bin
+          cd shanutechx/bin
+
+          # ── Xray-core ─────────────────────────────────────────────────────
+          XRAY_VER="v26.6.1"
+          XRAY_BASE="https://github.com/XTLS/Xray-core/releases/download/${XRAY_VER}/"
+          case "${{ matrix.platform }}" in
+            amd64)  wget -q "${XRAY_BASE}Xray-linux-64.zip"         && unzip -q Xray-linux-64.zip         && rm Xray-linux-64.zip ;;
+            arm64)  wget -q "${XRAY_BASE}Xray-linux-arm64-v8a.zip"  && unzip -q Xray-linux-arm64-v8a.zip  && rm Xray-linux-arm64-v8a.zip ;;
+            armv7)  wget -q "${XRAY_BASE}Xray-linux-arm32-v7a.zip"  && unzip -q Xray-linux-arm32-v7a.zip  && rm Xray-linux-arm32-v7a.zip ;;
+            armv6)  wget -q "${XRAY_BASE}Xray-linux-arm32-v6.zip"   && unzip -q Xray-linux-arm32-v6.zip   && rm Xray-linux-arm32-v6.zip ;;
+            386)    wget -q "${XRAY_BASE}Xray-linux-32.zip"          && unzip -q Xray-linux-32.zip          && rm Xray-linux-32.zip ;;
+            armv5)  wget -q "${XRAY_BASE}Xray-linux-arm32-v5.zip"   && unzip -q Xray-linux-arm32-v5.zip   && rm Xray-linux-arm32-v5.zip ;;
+            s390x)  wget -q "${XRAY_BASE}Xray-linux-s390x.zip"      && unzip -q Xray-linux-s390x.zip      && rm Xray-linux-s390x.zip ;;
+          esac
+
+          # ── Geo-data ──────────────────────────────────────────────────────
+          rm -f geoip.dat geosite.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat
+          wget -q https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat
+          wget -qO geoip_IR.dat   https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geoip.dat
+          wget -qO geosite_IR.dat https://github.com/chocolate4u/Iran-v2ray-rules/releases/latest/download/geosite.dat
+          wget -qO geoip_RU.dat   https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geoip.dat
+          wget -qO geosite_RU.dat https://github.com/runetfreedom/russia-v2ray-rules-dat/releases/latest/download/geosite.dat
+
+          mv xray xray-linux-${{ matrix.platform }}
+          cd ../..
+
+      # ── 4. Package ───────────────────────────────────────────────────────
+      - name: Package
+        run: |
+          tar -zcf shanutechx-linux-${{ matrix.platform }}.tar.gz shanutechx
+
+      # ── 5. Upload artifact (every build) ────────────────────────────────
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: shanutechx-linux-${{ matrix.platform }}
+          path: shanutechx-linux-${{ matrix.platform }}.tar.gz
+          retention-days: 7
+
+      # ── 6. Publish to GitHub Release (tag pushes only) ──────────────────
+      - name: Upload to GitHub Release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          file: shanutechx-linux-${{ matrix.platform }}.tar.gz
+          asset_name: shanutechx-linux-${{ matrix.platform }}.tar.gz
+          overwrite: true
+          prerelease: false
+          release_name: "ShanuTechX ${{ github.ref_name }}"
+          body: |
+            ## ShanuTechX Panel ${{ github.ref_name }}
+
+            Branded fork of [3x-ui](https://github.com/MHSanaei/3x-ui).
+
+            ### Install
+            ```bash
+            bash <(curl -sL https://raw.githubusercontent.com/ShanudhaTirosh/shanutechx-panel/main/shanutechx-install.sh)
+            ```
+
+            ### Assets
+            | File | Architecture |
+            |---|---|
+            | `shanutechx-linux-amd64.tar.gz` | Most VPS / x86-64 servers |
+            | `shanutechx-linux-arm64.tar.gz` | Raspberry Pi 4, AWS Graviton |
+            | `shanutechx-linux-armv7.tar.gz` | Raspberry Pi 3 |
+            | `shanutechx-linux-386.tar.gz`   | 32-bit x86 |

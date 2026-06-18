@@ -1,0 +1,224 @@
+/* ─── ShanuTechX glassmorphism shell — background palette ───────────────────
+   Each theme exposes --bg-page, --bg-card, and a set of --shell-* gradient
+   stops used by the animated blob overlay below. All three variants (light /
+   dark / ultra-dark) are explicitly listed so the existing theme toggle in
+   useTheme.tsx keeps working without any JS changes.
+─────────────────────────────────────────────────────────────────────────────── */
+
+.index-page,
+.clients-page,
+.inbounds-page,
+.xray-page,
+.settings-page,
+.nodes-page,
+.groups-page,
+.api-docs-page,
+.hosts-page {
+  /* light theme ─ soft lavender→blush gradient */
+  --bg-page:       #eef0fb;
+  --bg-card:       rgba(255, 255, 255, 0.72);
+  --glass-border:  rgba(255, 255, 255, 0.55);
+  --glass-shadow:  0 2px 8px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255,255,255,0.55);
+  --glass-blur:    18px;
+  --glass-sat:     160%;
+  --shell-blob-1:  rgba(99,  102, 241, 0.22);
+  --shell-blob-2:  rgba(236, 72,  153, 0.14);
+  --shell-blob-3:  rgba(20,  184, 166, 0.12);
+
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 18% 12%,  var(--shell-blob-1) 0%, transparent 55%),
+    radial-gradient(ellipse at 82% 88%,  var(--shell-blob-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%,  var(--shell-blob-3) 0%, transparent 60%),
+    linear-gradient(145deg, #eef0fb 0%, #fdf2f8 55%, #ecfeff 100%);
+  background-attachment: fixed;
+}
+
+/* dark theme ─ deep navy gradient */
+.index-page.is-dark,
+.clients-page.is-dark,
+.inbounds-page.is-dark,
+.xray-page.is-dark,
+.settings-page.is-dark,
+.nodes-page.is-dark,
+.groups-page.is-dark,
+.api-docs-page.is-dark,
+.hosts-page.is-dark {
+  --bg-page:       #0e1018;
+  --bg-card:       rgba(30, 33, 42, 0.62);
+  --glass-border:  rgba(255, 255, 255, 0.09);
+  --glass-shadow:  0 2px 8px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255,255,255,0.07);
+  --glass-blur:    20px;
+  --glass-sat:     140%;
+  --shell-blob-1:  rgba(59, 130, 246, 0.20);
+  --shell-blob-2:  rgba(99, 102, 241, 0.16);
+  --shell-blob-3:  rgba(15,  50, 100, 0.30);
+
+  background:
+    radial-gradient(ellipse at 20% 10%,  var(--shell-blob-1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 90%,  var(--shell-blob-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%,  var(--shell-blob-3) 0%, transparent 65%),
+    linear-gradient(155deg, #0e1018 0%, #0d1628 50%, #0a0f18 100%);
+  background-attachment: fixed;
+}
+
+/* ultra-dark theme ─ pure black with a hint of indigo depth */
+.index-page.is-dark.is-ultra,
+.clients-page.is-dark.is-ultra,
+.inbounds-page.is-dark.is-ultra,
+.xray-page.is-dark.is-ultra,
+.settings-page.is-dark.is-ultra,
+.nodes-page.is-dark.is-ultra,
+.groups-page.is-dark.is-ultra,
+.api-docs-page.is-dark.is-ultra,
+.hosts-page.is-dark.is-ultra {
+  --bg-page:       #000000;
+  --bg-card:       rgba(14, 15, 22, 0.70);
+  --glass-border:  rgba(255, 255, 255, 0.05);
+  --glass-shadow:  0 2px 8px rgba(0, 0, 0, 0.70), 0 0 0 1px rgba(255,255,255,0.04);
+  --glass-blur:    22px;
+  --glass-sat:     120%;
+  --shell-blob-1:  rgba(99,  102, 241, 0.12);
+  --shell-blob-2:  rgba(59,  130, 246, 0.10);
+  --shell-blob-3:  rgba(168,  85, 247, 0.08);
+
+  background:
+    radial-gradient(ellipse at 15% 10%,  var(--shell-blob-1) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 85%,  var(--shell-blob-2) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 45%,  var(--shell-blob-3) 0%, transparent 55%),
+    #000;
+  background-attachment: fixed;
+}
+
+/* ─── layout transparency passthrough ───────────────────────────────────────
+   The gradient lives on the page root; all Ant Design layout wrappers must be
+   transparent so they don't paint over it.
+─────────────────────────────────────────────────────────────────────────────── */
+.index-page .ant-layout,
+.index-page .ant-layout-content,
+.clients-page .ant-layout,
+.clients-page .ant-layout-content,
+.inbounds-page .ant-layout,
+.inbounds-page .ant-layout-content,
+.xray-page .ant-layout,
+.xray-page .ant-layout-content,
+.settings-page .ant-layout,
+.settings-page .ant-layout-content,
+.nodes-page .ant-layout,
+.nodes-page .ant-layout-content,
+.groups-page .ant-layout,
+.groups-page .ant-layout-content,
+.api-docs-page .ant-layout,
+.api-docs-page .ant-layout-content,
+.hosts-page .ant-layout,
+.hosts-page .ant-layout-content {
+  background: transparent;
+}
+
+.index-page .content-shell,
+.clients-page .content-shell,
+.inbounds-page .content-shell,
+.xray-page .content-shell,
+.settings-page .content-shell,
+.nodes-page .content-shell,
+.groups-page .content-shell,
+.api-docs-page .content-shell,
+.hosts-page .content-shell {
+  background: transparent;
+}
+
+/* ─── content padding ────────────────────────────────────────────────────── */
+.index-page .content-area,
+.clients-page .content-area,
+.inbounds-page .content-area,
+.xray-page .content-area,
+.settings-page .content-area,
+.nodes-page .content-area,
+.groups-page .content-area,
+.hosts-page .content-area {
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .clients-page .content-area,
+  .inbounds-page .content-area,
+  .nodes-page .content-area,
+  .groups-page .content-area,
+  .hosts-page .content-area {
+    padding: 8px;
+  }
+}
+
+.loading-spacer {
+  min-height: calc(100vh - 120px);
+}
+
+/* ─── summary card padding ───────────────────────────────────────────────── */
+.clients-page .summary-card,
+.inbounds-page .summary-card,
+.nodes-page .summary-card,
+.groups-page .summary-card,
+.hosts-page .summary-card {
+  padding: 16px;
+}
+
+@media (max-width: 768px) {
+  .clients-page .summary-card,
+  .inbounds-page .summary-card,
+  .nodes-page .summary-card,
+  .groups-page .summary-card,
+  .hosts-page .summary-card {
+    padding: 8px;
+  }
+}
+
+/* ─── dropdown styling (unchanged from upstream) ────────────────────────── */
+.ant-dropdown .ant-dropdown-menu {
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+
+.ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):not(.ant-dropdown-menu-item-danger):hover,
+.ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):not(.ant-dropdown-menu-item-danger):hover .ant-dropdown-menu-title-content,
+.ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):not(.ant-dropdown-menu-item-danger):hover > .anticon {
+  color: var(--ant-color-primary) !important;
+}
+
+.ant-dropdown-menu-item:not(.ant-dropdown-menu-item-disabled):not(.ant-dropdown-menu-item-danger):hover {
+  background-color: color-mix(in srgb, var(--ant-color-primary) 14%, transparent) !important;
+}
+
+.ant-dropdown-menu-item-divider {
+  background-color: var(--ant-color-border) !important;
+}
+
+body.dark .ant-dropdown-menu-item-divider {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ─── settings / xray header rows (unchanged from upstream) ─────────────── */
+.settings-page .header-row,
+.xray-page .header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.settings-page .header-actions,
+.xray-page .header-actions {
+  padding: 4px;
+}
+
+.settings-page .header-info,
+.xray-page .header-info {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ─── icons-only tabs (unchanged from upstream) ──────────────────────────── */
+.icons-only .ant-tabs-nav                          { margin-bottom: 8px; }
+.icons-only .ant-tabs-nav-wrap                     { width: 100%; }
+.icons-only .ant-tabs-nav-list                     { display: flex; width: 100%; }
+.icons-only .ant-tabs-tab                          { flex: 1 1 0; justify-content: center; margin: 0; padding: 10px 0; }
+.icons-only .ant-tabs-tab .anticon                 { margin: 0; font-size: 18px; }
+.icons-only .ant-tabs-nav-operations               { display: none; }

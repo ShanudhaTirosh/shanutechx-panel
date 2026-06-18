@@ -1,0 +1,148 @@
+/* ─── ShanuTechX glassmorphism card layer ────────────────────────────────────
+   Frosted-glass cards across all panel pages. Works on top of the gradient
+   backgrounds in page-shell.css. Three theme variants are explicit so the
+   light/dark/ultra-dark toggle in useTheme.tsx keeps working with zero JS
+   changes.
+─────────────────────────────────────────────────────────────────────────────── */
+
+/* ── light theme ────────────────────────────────────────────────────────── */
+.index-page .ant-card,
+.clients-page .ant-card,
+.inbounds-page .ant-card,
+.xray-page .ant-card,
+.settings-page .ant-card,
+.nodes-page .ant-card,
+.groups-page .ant-card,
+.api-docs-page .ant-card,
+.hosts-page .ant-card {
+  background: var(--bg-card, rgba(255, 255, 255, 0.72));
+  backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-sat, 160%));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 18px)) saturate(var(--glass-sat, 160%));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.55));
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow, 0 2px 8px rgba(0, 0, 0, 0.06));
+  transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+/* ── dark theme ─────────────────────────────────────────────────────────── */
+.index-page.is-dark .ant-card,
+.clients-page.is-dark .ant-card,
+.inbounds-page.is-dark .ant-card,
+.xray-page.is-dark .ant-card,
+.settings-page.is-dark .ant-card,
+.nodes-page.is-dark .ant-card,
+.groups-page.is-dark .ant-card,
+.api-docs-page.is-dark .ant-card,
+.hosts-page.is-dark .ant-card {
+  background: var(--bg-card, rgba(30, 33, 42, 0.62));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.09));
+  box-shadow: var(--glass-shadow,
+    0 2px 8px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04));
+}
+
+/* ── ultra-dark theme ───────────────────────────────────────────────────── */
+.index-page.is-dark.is-ultra .ant-card,
+.clients-page.is-dark.is-ultra .ant-card,
+.inbounds-page.is-dark.is-ultra .ant-card,
+.xray-page.is-dark.is-ultra .ant-card,
+.settings-page.is-dark.is-ultra .ant-card,
+.nodes-page.is-dark.is-ultra .ant-card,
+.groups-page.is-dark.is-ultra .ant-card,
+.api-docs-page.is-dark.is-ultra .ant-card,
+.hosts-page.is-dark.is-ultra .ant-card {
+  background: var(--bg-card, rgba(14, 15, 22, 0.70));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--glass-shadow,
+    0 2px 8px rgba(0, 0, 0, 0.70),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025));
+}
+
+/* ── hover elevation — light ────────────────────────────────────────────── */
+.index-page .ant-card.ant-card-hoverable:hover,
+.clients-page .ant-card.ant-card-hoverable:hover,
+.inbounds-page .ant-card.ant-card-hoverable:hover,
+.xray-page .ant-card.ant-card-hoverable:hover,
+.settings-page .ant-card.ant-card-hoverable:hover,
+.nodes-page .ant-card.ant-card-hoverable:hover,
+.groups-page .ant-card.ant-card-hoverable:hover,
+.api-docs-page .ant-card.ant-card-hoverable:hover,
+.hosts-page .ant-card.ant-card-hoverable:hover {
+  cursor: default;
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 28px rgba(0, 0, 0, 0.10),
+    0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+/* ── hover elevation — dark ─────────────────────────────────────────────── */
+.index-page.is-dark .ant-card.ant-card-hoverable:hover,
+.clients-page.is-dark .ant-card.ant-card-hoverable:hover,
+.inbounds-page.is-dark .ant-card.ant-card-hoverable:hover,
+.xray-page.is-dark .ant-card.ant-card-hoverable:hover,
+.settings-page.is-dark .ant-card.ant-card-hoverable:hover,
+.nodes-page.is-dark .ant-card.ant-card-hoverable:hover,
+.groups-page.is-dark .ant-card.ant-card-hoverable:hover,
+.api-docs-page.is-dark .ant-card.ant-card-hoverable:hover,
+.hosts-page.is-dark .ant-card.ant-card-hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── hover elevation — ultra-dark ───────────────────────────────────────── */
+.index-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.clients-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.inbounds-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.xray-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.settings-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.nodes-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.groups-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.api-docs-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover,
+.hosts-page.is-dark.is-ultra .ant-card.ant-card-hoverable:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.80),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* ── card action bar is transparent in all themes ───────────────────────── */
+.index-page .ant-card .ant-card-actions,
+.clients-page .ant-card .ant-card-actions,
+.inbounds-page .ant-card .ant-card-actions,
+.xray-page .ant-card .ant-card-actions,
+.settings-page .ant-card .ant-card-actions,
+.nodes-page .ant-card .ant-card-actions,
+.groups-page .ant-card .ant-card-actions,
+.api-docs-page .ant-card .ant-card-actions,
+.hosts-page .ant-card .ant-card-actions {
+  background: transparent;
+}
+
+/* ── reduced-motion: disable card lift ───────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .index-page .ant-card,
+  .clients-page .ant-card,
+  .inbounds-page .ant-card,
+  .xray-page .ant-card,
+  .settings-page .ant-card,
+  .nodes-page .ant-card,
+  .groups-page .ant-card,
+  .api-docs-page .ant-card,
+  .hosts-page .ant-card {
+    transition: none;
+  }
+
+  .index-page .ant-card.ant-card-hoverable:hover,
+  .clients-page .ant-card.ant-card-hoverable:hover,
+  .inbounds-page .ant-card.ant-card-hoverable:hover,
+  .xray-page .ant-card.ant-card-hoverable:hover,
+  .settings-page .ant-card.ant-card-hoverable:hover,
+  .nodes-page .ant-card.ant-card-hoverable:hover,
+  .groups-page .ant-card.ant-card-hoverable:hover,
+  .api-docs-page .ant-card.ant-card-hoverable:hover,
+  .hosts-page .ant-card.ant-card-hoverable:hover {
+    transform: none;
+  }
+}
