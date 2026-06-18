@@ -56,7 +56,7 @@ jobs:
       # The Go binary embeds internal/web/dist at compile time (//go:embed all:dist).
       # The frontend MUST be built before `go build`.
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version-file: .nvmrc
           cache: npm
